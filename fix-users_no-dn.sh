@@ -32,7 +32,7 @@ i=1
 for line in $(cat $LDIF); do 
     #expr="$(echo $line | sed -e s+:\ +\=\'+ -e s+\$+\'+)"
     #eval "$expr"
-    unset taildn LDAP_dn PRINTDN dn uidlogin uidindex 
+    unset taildn LDAP_dn PRINTDN dn uidlogin uidindex
     # unset $(eval echo \$ATTRVAL_$i)
 
     [ -n "$(echo "$line" | grep "^\ ")" ] && continue;
@@ -40,7 +40,7 @@ for line in $(cat $LDIF); do
     export ATTRVAL_$i="$(echo $line | cut -d' ' -f2-)";  
     export ATTRKEY_$i="$(echo $line | cut -d: -f1)";  
     [ -n "$(echo $line | grep -o "uid:")" ] && uidindex=$i;
-    [ -n "$uidindex" ] && [ -z "$ATTRVAL_1" ] { ATTRVAL_1=$(echo $NEWDN | ); export ATTRVAL_1="$UIDATTR=$(eval echo \$ATTRVAL_$uidindex),$(echo $TAILDN | cut -d, -f2-)"
+    [ -n "$uidindex" ] && [ -z "$ATTRVAL_1" ] && export ATTRVAL_1="$UIDATTR=$(eval echo \$ATTRVAL_$uidindex),$(echo $NEWDN | cut -d, -f2-)"
     if [ -n "$(echo $line | grep "^dn:" )" ]; then 
            echo | awk -v numattr=$i '{for(j=1;j<numattr;j++) { print ENVIRON["ATTRKEY_"j]": "ENVIRON["ATTRVAL_"j];}}'
            #while [ $j -le $i ]; do
@@ -48,6 +48,7 @@ for line in $(cat $LDIF); do
            #    echo "$(eval echo \$ATTRKEY_$j): $(eval echo \$ATTRVAL_$j)";
            #    ((j++));   
            #done; 
+           unset ATTRVAL_1
            i=1;
     fi
         #XXX debug 
