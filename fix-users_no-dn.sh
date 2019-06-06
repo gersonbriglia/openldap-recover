@@ -19,7 +19,7 @@ BASEDN="dc=UEA.EDU,dc=BR"
 # the uid attribute name (openldap default is "uid")
 UIDATTR="uid"
 # set the new DN value (the __UID__ will be replaced by uid value)
-TAILDN="$UIDATTR=__UID__,ou=Setores_Gerais,$BASEDN"
+NEWDN="$UIDATTR=__UID__,ou=Setores_Gerais,$BASEDN"
 
 [ $# -lt 1 ] && { echo -e "\n\nUsage: $MYNAME <file.ldif>"; exit 1; }
 LDIF=$1
@@ -40,7 +40,7 @@ for line in $(cat $LDIF); do
     export ATTRVAL_$i="$(echo $line | cut -d' ' -f2-)";  
     export ATTRKEY_$i="$(echo $line | cut -d: -f1)";  
     [ -n "$(echo $line | grep -o "uid:")" ] && uidindex=$i;
-    [ -n "$uidindex" ] && { ATTRVAL_1=$(echo $NEWDN | ); export ATTRVAL_1="$UIDATTR=$(eval echo \$ATTRVAL_$uidindex),$(echo $TAILDN | cut -d, -f2-)"
+    [ -n "$uidindex" ] && [ -z "$ATTRVAL_1" ] { ATTRVAL_1=$(echo $NEWDN | ); export ATTRVAL_1="$UIDATTR=$(eval echo \$ATTRVAL_$uidindex),$(echo $TAILDN | cut -d, -f2-)"
     if [ -n "$(echo $line | grep "^dn:" )" ]; then 
            echo | awk -v numattr=$i '{for(j=1;j<numattr;j++) { print ENVIRON["ATTRKEY_"j]": "ENVIRON["ATTRVAL_"j];}}'
            #while [ $j -le $i ]; do
